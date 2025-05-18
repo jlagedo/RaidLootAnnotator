@@ -5,6 +5,7 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using Lumina.Excel.Sheets;
+using static FFXIVClientStructs.FFXIV.Component.GUI.AtkComponentNumericInput.Delegates;
 
 namespace RaidLootAnnotator.Windows;
 
@@ -12,6 +13,9 @@ public class MainWindow : Window, IDisposable
 {
     private string GoatImagePath;
     private Plugin Plugin;
+    // Light red color (RGBA: 1.0, 0.6, 0.6, 1.0)
+    private readonly uint lightRed = ImGui.ColorConvertFloat4ToU32(new Vector4(1.0f, 0.6f, 0.6f, 1.0f));
+    private readonly uint lightGreen = ImGui.ColorConvertFloat4ToU32(new Vector4(0.6f, 1.0f, 0.6f, 1.0f));
 
     // We give this window a hidden ID using ##
     // So that the user will see "My Amazing Window" as window title,
@@ -33,6 +37,7 @@ public class MainWindow : Window, IDisposable
 
     public override void Draw()
     {
+
         // Do not use .Text() or any other formatted function like TextWrapped(), or SetTooltip().
         // These expect formatting parameter if any part of the text contains a "%", which we can't
         // provide through our bindings, leading to a Crash to Desktop.
@@ -45,7 +50,11 @@ public class MainWindow : Window, IDisposable
         //}
 
         ImGui.Spacing();
-
+        if (ImGui.Button("Reset All Values"))
+        {
+            Plugin.Configuration.LootData.ResetAllValues();
+            Plugin.Configuration.Save();
+        }
 
         DrawLootTableAcc();
 
@@ -55,8 +64,22 @@ public class MainWindow : Window, IDisposable
 
     }
 
+    private void DrawLootInputCell(string label, Func<int> getter, Action<int> setter)
+    {
+        var value = getter();
+        ChangeColorByValue(value);
+        if (ImGui.InputInt(label, ref value))
+        {
+            value = Math.Max(0, value);
+            setter(value);
+            Plugin.Configuration.Save();
+        }
+    }
+
     private void DrawLootTableAcc()
     {
+
+
 
         // Normally a BeginChild() would have to be followed by an unconditional EndChild(),
         // ImRaii takes care of this after the scope ends.
@@ -83,39 +106,31 @@ public class MainWindow : Window, IDisposable
 
                     ImGui.TableSetColumnIndex(0);
                     ImGui.SetNextItemWidth(-1);
-                    var earsValue = Plugin.Configuration.LootData.EarsValue;
-                    if (ImGui.InputInt("##EarsInput", ref earsValue))
-                    {
-                        Plugin.Configuration.LootData.EarsValue = earsValue;
-                        Plugin.Configuration.Save();
-                    }
+
+                    DrawLootInputCell("##EarsInput",
+                        () => Plugin.Configuration.LootData.EarsValue,
+                        v => Plugin.Configuration.LootData.EarsValue = v);
 
                     ImGui.TableSetColumnIndex(1);
                     ImGui.SetNextItemWidth(-1);
-                    var neckValue = Plugin.Configuration.LootData.NeckValue;
-                    if (ImGui.InputInt("##NeckInput", ref neckValue))
-                    {
-                        Plugin.Configuration.LootData.NeckValue = neckValue;
-                        Plugin.Configuration.Save();
-                    }
+
+                    DrawLootInputCell("##NeckInput",
+                        () => Plugin.Configuration.LootData.NeckValue,
+                        v => Plugin.Configuration.LootData.NeckValue = v);
 
                     ImGui.TableSetColumnIndex(2);
                     ImGui.SetNextItemWidth(-1);
-                    var wristsValue = Plugin.Configuration.LootData.WristsValue;
-                    if (ImGui.InputInt("##WristsInput", ref wristsValue))
-                    {
-                        Plugin.Configuration.LootData.WristsValue = wristsValue;
-                        Plugin.Configuration.Save();
-                    }
+
+                    DrawLootInputCell("##WristsInput",
+                        () => Plugin.Configuration.LootData.WristsValue,
+                        v => Plugin.Configuration.LootData.WristsValue = v);
 
                     ImGui.TableSetColumnIndex(3);
                     ImGui.SetNextItemWidth(-1);
-                    var ringValue = Plugin.Configuration.LootData.RingValue;
-                    if (ImGui.InputInt("##RingInput", ref ringValue))
-                    {
-                        Plugin.Configuration.LootData.RingValue = ringValue;
-                        Plugin.Configuration.Save();
-                    }
+
+                    DrawLootInputCell("##RingInput",
+                        () => Plugin.Configuration.LootData.RingValue,
+                        v => Plugin.Configuration.LootData.RingValue = v);
 
                     ImGui.EndTable();
                 }
@@ -176,24 +191,26 @@ public class MainWindow : Window, IDisposable
         }
     }
 
+    private void ChangeColorByValue(int earsValue)
+    {
+        if (earsValue <= 0)
+            ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, lightGreen);
+        //if (earsValue > 0)
+        //    ImGui.TableSetBgColor(ImGuiTableBgTarget.CellBg, lightRed);
+    }
+
     private void DrawLootTableGear()
     {
-
-        // Normally a BeginChild() would have to be followed by an unconditional EndChild(),
-        // ImRaii takes care of this after the scope ends.
-        // This works for all ImGui functions that require specific handling, examples are BeginTable() or Indent().
         using (var child = ImRaii.Child("SomeChildWithAScrollbar", Vector2.Zero, true))
         {
-            // Check if this child is drawing
             if (child.Success)
             {
                 ImGui.TextUnformatted("Gear");
 
-                ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(10, 10)); // Adjust values as needed
+                ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(10, 10));
 
                 if (ImGui.BeginTable("LootTableGear", 6, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg))
                 {
-                    // Set up the headers
                     ImGui.TableSetupColumn("Weapon");
                     ImGui.TableSetupColumn("Head");
                     ImGui.TableSetupColumn("Body");
@@ -206,85 +223,58 @@ public class MainWindow : Window, IDisposable
 
                     ImGui.TableSetColumnIndex(0);
                     ImGui.SetNextItemWidth(-1);
-                    var weaponValue = Plugin.Configuration.LootData.WeaponValue;
-                    if (ImGui.InputInt("##WeaponInput", ref weaponValue))
-                    {
-                        Plugin.Configuration.LootData.WeaponValue = weaponValue;
-                        Plugin.Configuration.Save();
-                    }
+                    DrawLootInputCell("##WeaponInput",
+                        () => Plugin.Configuration.LootData.WeaponValue,
+                        v => Plugin.Configuration.LootData.WeaponValue = v);
 
                     ImGui.TableSetColumnIndex(1);
                     ImGui.SetNextItemWidth(-1);
-                    var headValue = Plugin.Configuration.LootData.HeadValue;
-                    if (ImGui.InputInt("##HeadInput", ref headValue))
-                    {
-                        Plugin.Configuration.LootData.HeadValue = headValue;
-                        Plugin.Configuration.Save();
-                    }
+                    DrawLootInputCell("##HeadInput",
+                        () => Plugin.Configuration.LootData.HeadValue,
+                        v => Plugin.Configuration.LootData.HeadValue = v);
 
                     ImGui.TableSetColumnIndex(2);
                     ImGui.SetNextItemWidth(-1);
-                    var bodyValue = Plugin.Configuration.LootData.BodyValue;
-                    if (ImGui.InputInt("##BodyInput", ref bodyValue))
-                    {
-                        Plugin.Configuration.LootData.BodyValue = bodyValue;
-                        Plugin.Configuration.Save();
-                    }
+                    DrawLootInputCell("##BodyInput",
+                        () => Plugin.Configuration.LootData.BodyValue,
+                        v => Plugin.Configuration.LootData.BodyValue = v);
 
                     ImGui.TableSetColumnIndex(3);
                     ImGui.SetNextItemWidth(-1);
-                    var handsValue = Plugin.Configuration.LootData.HandsValue;
-                    if (ImGui.InputInt("##HandsInput", ref handsValue))
-                    {
-                        Plugin.Configuration.LootData.HandsValue = handsValue;
-                        Plugin.Configuration.Save();
-                    }
+                    DrawLootInputCell("##HandsInput",
+                        () => Plugin.Configuration.LootData.HandsValue,
+                        v => Plugin.Configuration.LootData.HandsValue = v);
 
                     ImGui.TableSetColumnIndex(4);
                     ImGui.SetNextItemWidth(-1);
-                    var legsValue = Plugin.Configuration.LootData.LegsValue;
-                    if (ImGui.InputInt("##LegsInput", ref legsValue))
-                    {
-                        Plugin.Configuration.LootData.LegsValue = legsValue;
-                        Plugin.Configuration.Save();
-                    }
-
+                    DrawLootInputCell("##LegsInput",
+                        () => Plugin.Configuration.LootData.LegsValue,
+                        v => Plugin.Configuration.LootData.LegsValue = v);
 
                     ImGui.TableSetColumnIndex(5);
                     ImGui.SetNextItemWidth(-1);
-                    var feetValue = Plugin.Configuration.LootData.FeetValue;
-                    if (ImGui.InputInt("##FeetInput", ref feetValue))
-                    {
-                        Plugin.Configuration.LootData.FeetValue = feetValue;
-                        Plugin.Configuration.Save();
-                    }
+                    DrawLootInputCell("##FeetInput",
+                        () => Plugin.Configuration.LootData.FeetValue,
+                        v => Plugin.Configuration.LootData.FeetValue = v);
+
                     ImGui.EndTable();
                 }
 
                 ImGui.PopStyleVar();
-
             }
         }
     }
 
     private void DrawLootTableUpgrades()
     {
-
-        // Normally a BeginChild() would have to be followed by an unconditional EndChild(),
-        // ImRaii takes care of this after the scope ends.
-        // This works for all ImGui functions that require specific handling, examples are BeginTable() or Indent().
         using (var child = ImRaii.Child("SomeChildWithAScrollbar", Vector2.Zero, true))
         {
-            // Check if this child is drawing
             if (child.Success)
             {
                 ImGui.TextUnformatted("Upgrades");
-
-                ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(10, 10)); // Adjust values as needed
-
+                ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(10, 10));
                 if (ImGui.BeginTable("LootTableUpgrades", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg))
                 {
-                    // Set up the headers
                     ImGui.TableSetupColumn("Weapon Token");
                     ImGui.TableSetupColumn("Weapon Upgrade");
                     ImGui.TableSetupColumn("Accessorie Upgrade");
@@ -295,45 +285,31 @@ public class MainWindow : Window, IDisposable
 
                     ImGui.TableSetColumnIndex(0);
                     ImGui.SetNextItemWidth(-1);
-                    var weaponTokenValue = Plugin.Configuration.LootData.WeaponTokenValue;
-                    if (ImGui.InputInt("##WeaponTokenInput", ref weaponTokenValue))
-                    {
-                        Plugin.Configuration.LootData.WeaponTokenValue = weaponTokenValue;
-                        Plugin.Configuration.Save();
-                    }
+                    DrawLootInputCell("##WeaponTokenInput",
+                        () => Plugin.Configuration.LootData.WeaponTokenValue,
+                        v => Plugin.Configuration.LootData.WeaponTokenValue = v);
 
                     ImGui.TableSetColumnIndex(1);
                     ImGui.SetNextItemWidth(-1);
-                    var weaponUpgradeValue = Plugin.Configuration.LootData.WeaponUpgradeValue;
-                    if (ImGui.InputInt("##WeaponUpgradeInput", ref weaponUpgradeValue))
-                    {
-                        Plugin.Configuration.LootData.WeaponUpgradeValue = weaponUpgradeValue;
-                        Plugin.Configuration.Save();
-                    }
+                    DrawLootInputCell("##WeaponUpgradeInput",
+                        () => Plugin.Configuration.LootData.WeaponUpgradeValue,
+                        v => Plugin.Configuration.LootData.WeaponUpgradeValue = v);
 
                     ImGui.TableSetColumnIndex(2);
                     ImGui.SetNextItemWidth(-1);
-                    var accUpgradeValue = Plugin.Configuration.LootData.AccUpgradeValue;
-                    if (ImGui.InputInt("##AccUpgradeValueInput", ref accUpgradeValue))
-                    {
-                        Plugin.Configuration.LootData.AccUpgradeValue = accUpgradeValue;
-                        Plugin.Configuration.Save();
-                    }
+                    DrawLootInputCell("##AccUpgradeValueInput",
+                        () => Plugin.Configuration.LootData.AccUpgradeValue,
+                        v => Plugin.Configuration.LootData.AccUpgradeValue = v);
 
                     ImGui.TableSetColumnIndex(3);
                     ImGui.SetNextItemWidth(-1);
-                    var gearUpgradeValue = Plugin.Configuration.LootData.GearUpgradeValue;
-                    if (ImGui.InputInt("##GearUpgradeValueInput", ref gearUpgradeValue))
-                    {
-                        Plugin.Configuration.LootData.GearUpgradeValue = gearUpgradeValue;
-                        Plugin.Configuration.Save();
-                    }
+                    DrawLootInputCell("##GearUpgradeValueInput",
+                        () => Plugin.Configuration.LootData.GearUpgradeValue,
+                        v => Plugin.Configuration.LootData.GearUpgradeValue = v);
 
                     ImGui.EndTable();
                 }
-
                 ImGui.PopStyleVar();
-
             }
         }
     }
