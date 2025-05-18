@@ -13,5 +13,11 @@ namespace RaidLootAnnotator
         public int NeckValue { get; set; } = 0;
         public int WristsValue { get; set; } = 0;
         public int RingValue { get; set; } = 0;
+        public int WeaponValue { get; set; } = 0;
+        public int HeadValue { get; set; } = 0;
+        public int BodyValue { get; set; } = 0;
+        public int HandsValue { get; set; } = 0;
+        public int LegsValue { get; set; } = 0;
+        public int FeetValue { get; set; } = 0;
     }
 }
