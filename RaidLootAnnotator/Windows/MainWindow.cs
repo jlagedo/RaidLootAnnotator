@@ -51,6 +51,8 @@ public class MainWindow : Window, IDisposable
 
         DrawLootTableGear();
 
+        DrawLootTableUpgrades();
+
     }
 
     private void DrawLootTableAcc()
@@ -264,4 +266,76 @@ public class MainWindow : Window, IDisposable
             }
         }
     }
+
+    private void DrawLootTableUpgrades()
+    {
+
+        // Normally a BeginChild() would have to be followed by an unconditional EndChild(),
+        // ImRaii takes care of this after the scope ends.
+        // This works for all ImGui functions that require specific handling, examples are BeginTable() or Indent().
+        using (var child = ImRaii.Child("SomeChildWithAScrollbar", Vector2.Zero, true))
+        {
+            // Check if this child is drawing
+            if (child.Success)
+            {
+                ImGui.TextUnformatted("Upgrades");
+
+                ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(10, 10)); // Adjust values as needed
+
+                if (ImGui.BeginTable("LootTableUpgrades", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg))
+                {
+                    // Set up the headers
+                    ImGui.TableSetupColumn("Weapon Token");
+                    ImGui.TableSetupColumn("Weapon Upgrade");
+                    ImGui.TableSetupColumn("Accessorie Upgrade");
+                    ImGui.TableSetupColumn("Gear Upgrade");
+
+                    ImGui.TableHeadersRow();
+                    ImGui.TableNextRow();
+
+                    ImGui.TableSetColumnIndex(0);
+                    ImGui.SetNextItemWidth(-1);
+                    var weaponTokenValue = Plugin.Configuration.LootData.WeaponTokenValue;
+                    if (ImGui.InputInt("##WeaponTokenInput", ref weaponTokenValue))
+                    {
+                        Plugin.Configuration.LootData.WeaponTokenValue = weaponTokenValue;
+                        Plugin.Configuration.Save();
+                    }
+
+                    ImGui.TableSetColumnIndex(1);
+                    ImGui.SetNextItemWidth(-1);
+                    var weaponUpgradeValue = Plugin.Configuration.LootData.WeaponUpgradeValue;
+                    if (ImGui.InputInt("##WeaponUpgradeInput", ref weaponUpgradeValue))
+                    {
+                        Plugin.Configuration.LootData.WeaponUpgradeValue = weaponUpgradeValue;
+                        Plugin.Configuration.Save();
+                    }
+
+                    ImGui.TableSetColumnIndex(2);
+                    ImGui.SetNextItemWidth(-1);
+                    var accUpgradeValue = Plugin.Configuration.LootData.AccUpgradeValue;
+                    if (ImGui.InputInt("##AccUpgradeValueInput", ref accUpgradeValue))
+                    {
+                        Plugin.Configuration.LootData.AccUpgradeValue = accUpgradeValue;
+                        Plugin.Configuration.Save();
+                    }
+
+                    ImGui.TableSetColumnIndex(3);
+                    ImGui.SetNextItemWidth(-1);
+                    var gearUpgradeValue = Plugin.Configuration.LootData.GearUpgradeValue;
+                    if (ImGui.InputInt("##GearUpgradeValueInput", ref gearUpgradeValue))
+                    {
+                        Plugin.Configuration.LootData.GearUpgradeValue = gearUpgradeValue;
+                        Plugin.Configuration.Save();
+                    }
+
+                    ImGui.EndTable();
+                }
+
+                ImGui.PopStyleVar();
+
+            }
+        }
+    }
 }
+
