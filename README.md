@@ -1,12 +1,28 @@
-> ⚠️ **Don't click Fork!**
-> 
-> This is a GitHub Template repo. If you want to use this for a plugin, just [use this template][new-repo] to make a new repo!
->
-> ![image](https://github.com/goatcorp/RaidLootAnnotator/assets/16760685/d9732094-e1ed-4769-a70b-58ed2b92580c)
-
 # RaidLootAnnotator
 
-[![Use This Template badge](https://img.shields.io/badge/Use%20This%20Template-0?logo=github&labelColor=grey)][new-repo]
+
+## Data structure
+
+### Accessories
+| Ears  | Neck  | Wrists  | Ring  |
+|-------|-------|---------|-------|
+| 0 | 1 | 0 | 0 |
+
+### Gear
+| Weapon  | Head  | Body  | Hands  | Legs  | Feet  |
+|-------|-------|-------|--------|-------|-------|
+|0| 0 | 1 | 0 | 0 | 1 |
+
+### Upgrades
+| Weapon Token  | Weapon Up  | Accessories  | Gear  |
+|---------------|------------|--------------|-------|
+| 0 | 1 | 0 | 0 |
+
+
+
+
+
+
 
 
 Simple example plugin for Dalamud.

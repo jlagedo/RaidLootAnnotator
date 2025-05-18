@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
@@ -17,7 +17,7 @@ public class MainWindow : Window, IDisposable
     // So that the user will see "My Amazing Window" as window title,
     // but for ImGui the ID is "My Amazing Window##With a hidden ID"
     public MainWindow(Plugin plugin, string goatImagePath)
-        : base("My Amazing Window##With a hidden ID", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+        : base("Raid Loot Annotator##raidmain123", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         SizeConstraints = new WindowSizeConstraints
         {
@@ -54,21 +54,72 @@ public class MainWindow : Window, IDisposable
             // Check if this child is drawing
             if (child.Success)
             {
-                ImGui.TextUnformatted("Have a goat:");
+
+                if (ImGui.BeginTable("LootTable", 4, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg))
+                {
+                    // Set up the headers
+                    ImGui.TableSetupColumn("Ears");
+                    ImGui.TableSetupColumn("Neck");
+                    ImGui.TableSetupColumn("Wrists");
+                    ImGui.TableSetupColumn("Ring");
+                    ImGui.TableHeadersRow();
+
+                    ImGui.TableSetColumnIndex(0);
+                    ImGui.SetNextItemWidth(-1);
+
+                    var earsValue = Plugin.Configuration.LootData.EarsValue;
+                    if (ImGui.InputInt("##EarsInput", ref earsValue))
+                    {
+                        Plugin.Configuration.LootData.EarsValue = earsValue;
+                        Plugin.Configuration.Save();
+                    }                    
+
+                    ImGui.TableSetColumnIndex(1);
+                    ImGui.SetNextItemWidth(-1);
+                    var neckValue = Plugin.Configuration.LootData.NeckValue;
+                    if(ImGui.InputInt("##NeckInput", ref neckValue)) {
+                        Plugin.Configuration.LootData.NeckValue = neckValue;
+                        Plugin.Configuration.Save();
+                    }
+
+                    ImGui.TableSetColumnIndex(2);
+                    ImGui.SetNextItemWidth(-1);
+                    var wristsValue = Plugin.Configuration.LootData.WristsValue;
+                    if(ImGui.InputInt("##WristsInput", ref wristsValue))
+                    {
+                        Plugin.Configuration.LootData.WristsValue = wristsValue;
+                        Plugin.Configuration.Save();
+                    }
+
+                    ImGui.TableSetColumnIndex(3);
+                    ImGui.SetNextItemWidth(-1);
+                    var ringValue = Plugin.Configuration.LootData.RingValue;
+                    if(ImGui.InputInt("##RingInput", ref ringValue))
+                    {
+                        Plugin.Configuration.LootData.RingValue = ringValue;
+                        Plugin.Configuration.Save();
+                    }
+
+                    ImGui.EndTable();
+                }
+
+
+
+                ImGui.TextUnformatted("O Zellvish anotando as coisas de loot......");
                 var goatImage = Plugin.TextureProvider.GetFromFile(GoatImagePath).GetWrapOrDefault();
                 if (goatImage != null)
                 {
-                    using (ImRaii.PushIndent(55f))
-                    {
-                        ImGui.Image(goatImage.ImGuiHandle, new Vector2(goatImage.Width, goatImage.Height));
-                    }
+                    //using (ImRaii.PushIndent(0f))
+                    //{
+                        ImGui.Image(goatImage.ImGuiHandle, new Vector2(300f, 300f));
+                    //}
                 }
                 else
                 {
                     ImGui.TextUnformatted("Image not found.");
                 }
 
-                ImGuiHelpers.ScaledDummy(20.0f);
+                ImGuiHelpers.ScaledDummy(10.0f);
 
                 // Example for other services that Dalamud provides.
                 // ClientState provides a wrapper filled with information about the local player object and client.
