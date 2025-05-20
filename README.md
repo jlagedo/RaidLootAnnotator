@@ -1,4 +1,4 @@
-# RaidLootAnnotator
+# Raid Loot Annotator
 ![Raid Loot Annotator Banner](https://github.com/user-attachments/assets/59e701aa-5be3-494d-86f8-669b51a79cbb)
 ## Data structure
 
