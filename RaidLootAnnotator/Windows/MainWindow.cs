@@ -11,8 +11,7 @@ namespace RaidLootAnnotator.Windows;
 
 public class MainWindow : Window, IDisposable
 {
-    private string GoatImagePath;
-    private Plugin Plugin;
+    private readonly Plugin plugin;
     // Light red color (RGBA: 1.0, 0.6, 0.6, 1.0)
     private readonly uint lightRed = ImGui.ColorConvertFloat4ToU32(new Vector4(1.0f, 0.6f, 0.6f, 1.0f));
     private readonly uint lightGreen = ImGui.ColorConvertFloat4ToU32(new Vector4(0.6f, 1.0f, 0.6f, 1.0f));
@@ -20,7 +19,7 @@ public class MainWindow : Window, IDisposable
     // We give this window a hidden ID using ##
     // So that the user will see "My Amazing Window" as window title,
     // but for ImGui the ID is "My Amazing Window##With a hidden ID"
-    public MainWindow(Plugin plugin, string goatImagePath)
+    public MainWindow(Plugin plugin)
         : base("Raid Loot Annotator##raidmain123", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         SizeConstraints = new WindowSizeConstraints
@@ -28,9 +27,7 @@ public class MainWindow : Window, IDisposable
             MinimumSize = new Vector2(375, 330),
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
         };
-
-        GoatImagePath = goatImagePath;
-        Plugin = plugin;
+        this.plugin = plugin;
     }
 
     public void Dispose() { }
@@ -52,8 +49,8 @@ public class MainWindow : Window, IDisposable
         ImGui.Spacing();
         if (ImGui.Button("Reset All Values"))
         {
-            Plugin.Configuration.LootData.ResetAllValues();
-            Plugin.Configuration.Save();
+            plugin.Configuration.LootData.ResetAllValues();
+            plugin.Configuration.Save();
         }
 
         DrawLootTableAcc();
@@ -72,7 +69,7 @@ public class MainWindow : Window, IDisposable
         {
             value = Math.Max(0, value);
             setter(value);
-            Plugin.Configuration.Save();
+            plugin.Configuration.Save();
         }
     }
 
@@ -108,29 +105,29 @@ public class MainWindow : Window, IDisposable
                     ImGui.SetNextItemWidth(-1);
 
                     DrawLootInputCell("##EarsInput",
-                        () => Plugin.Configuration.LootData.EarsValue,
-                        v => Plugin.Configuration.LootData.EarsValue = v);
+                        () => plugin.Configuration.LootData.EarsValue,
+                        v => plugin.Configuration.LootData.EarsValue = v);
 
                     ImGui.TableSetColumnIndex(1);
                     ImGui.SetNextItemWidth(-1);
 
                     DrawLootInputCell("##NeckInput",
-                        () => Plugin.Configuration.LootData.NeckValue,
-                        v => Plugin.Configuration.LootData.NeckValue = v);
+                        () => plugin.Configuration.LootData.NeckValue,
+                        v => plugin.Configuration.LootData.NeckValue = v);
 
                     ImGui.TableSetColumnIndex(2);
                     ImGui.SetNextItemWidth(-1);
 
                     DrawLootInputCell("##WristsInput",
-                        () => Plugin.Configuration.LootData.WristsValue,
-                        v => Plugin.Configuration.LootData.WristsValue = v);
+                        () => plugin.Configuration.LootData.WristsValue,
+                        v => plugin.Configuration.LootData.WristsValue = v);
 
                     ImGui.TableSetColumnIndex(3);
                     ImGui.SetNextItemWidth(-1);
 
                     DrawLootInputCell("##RingInput",
-                        () => Plugin.Configuration.LootData.RingValue,
-                        v => Plugin.Configuration.LootData.RingValue = v);
+                        () => plugin.Configuration.LootData.RingValue,
+                        v => plugin.Configuration.LootData.RingValue = v);
 
                     ImGui.EndTable();
                 }
@@ -224,38 +221,38 @@ public class MainWindow : Window, IDisposable
                     ImGui.TableSetColumnIndex(0);
                     ImGui.SetNextItemWidth(-1);
                     DrawLootInputCell("##WeaponInput",
-                        () => Plugin.Configuration.LootData.WeaponValue,
-                        v => Plugin.Configuration.LootData.WeaponValue = v);
+                        () => plugin.Configuration.LootData.WeaponValue,
+                        v => plugin.Configuration.LootData.WeaponValue = v);
 
                     ImGui.TableSetColumnIndex(1);
                     ImGui.SetNextItemWidth(-1);
                     DrawLootInputCell("##HeadInput",
-                        () => Plugin.Configuration.LootData.HeadValue,
-                        v => Plugin.Configuration.LootData.HeadValue = v);
+                        () => plugin.Configuration.LootData.HeadValue,
+                        v => plugin.Configuration.LootData.HeadValue = v);
 
                     ImGui.TableSetColumnIndex(2);
                     ImGui.SetNextItemWidth(-1);
                     DrawLootInputCell("##BodyInput",
-                        () => Plugin.Configuration.LootData.BodyValue,
-                        v => Plugin.Configuration.LootData.BodyValue = v);
+                        () => plugin.Configuration.LootData.BodyValue,
+                        v => plugin.Configuration.LootData.BodyValue = v);
 
                     ImGui.TableSetColumnIndex(3);
                     ImGui.SetNextItemWidth(-1);
                     DrawLootInputCell("##HandsInput",
-                        () => Plugin.Configuration.LootData.HandsValue,
-                        v => Plugin.Configuration.LootData.HandsValue = v);
+                        () => plugin.Configuration.LootData.HandsValue,
+                        v => plugin.Configuration.LootData.HandsValue = v);
 
                     ImGui.TableSetColumnIndex(4);
                     ImGui.SetNextItemWidth(-1);
                     DrawLootInputCell("##LegsInput",
-                        () => Plugin.Configuration.LootData.LegsValue,
-                        v => Plugin.Configuration.LootData.LegsValue = v);
+                        () => plugin.Configuration.LootData.LegsValue,
+                        v => plugin.Configuration.LootData.LegsValue = v);
 
                     ImGui.TableSetColumnIndex(5);
                     ImGui.SetNextItemWidth(-1);
                     DrawLootInputCell("##FeetInput",
-                        () => Plugin.Configuration.LootData.FeetValue,
-                        v => Plugin.Configuration.LootData.FeetValue = v);
+                        () => plugin.Configuration.LootData.FeetValue,
+                        v => plugin.Configuration.LootData.FeetValue = v);
 
                     ImGui.EndTable();
                 }
@@ -286,26 +283,26 @@ public class MainWindow : Window, IDisposable
                     ImGui.TableSetColumnIndex(0);
                     ImGui.SetNextItemWidth(-1);
                     DrawLootInputCell("##WeaponTokenInput",
-                        () => Plugin.Configuration.LootData.WeaponTokenValue,
-                        v => Plugin.Configuration.LootData.WeaponTokenValue = v);
+                        () => plugin.Configuration.LootData.WeaponTokenValue,
+                        v => plugin.Configuration.LootData.WeaponTokenValue = v);
 
                     ImGui.TableSetColumnIndex(1);
                     ImGui.SetNextItemWidth(-1);
                     DrawLootInputCell("##WeaponUpgradeInput",
-                        () => Plugin.Configuration.LootData.WeaponUpgradeValue,
-                        v => Plugin.Configuration.LootData.WeaponUpgradeValue = v);
+                        () => plugin.Configuration.LootData.WeaponUpgradeValue,
+                        v => plugin.Configuration.LootData.WeaponUpgradeValue = v);
 
                     ImGui.TableSetColumnIndex(2);
                     ImGui.SetNextItemWidth(-1);
                     DrawLootInputCell("##AccUpgradeValueInput",
-                        () => Plugin.Configuration.LootData.AccUpgradeValue,
-                        v => Plugin.Configuration.LootData.AccUpgradeValue = v);
+                        () => plugin.Configuration.LootData.AccUpgradeValue,
+                        v => plugin.Configuration.LootData.AccUpgradeValue = v);
 
                     ImGui.TableSetColumnIndex(3);
                     ImGui.SetNextItemWidth(-1);
                     DrawLootInputCell("##GearUpgradeValueInput",
-                        () => Plugin.Configuration.LootData.GearUpgradeValue,
-                        v => Plugin.Configuration.LootData.GearUpgradeValue = v);
+                        () => plugin.Configuration.LootData.GearUpgradeValue,
+                        v => plugin.Configuration.LootData.GearUpgradeValue = v);
 
                     ImGui.EndTable();
                 }

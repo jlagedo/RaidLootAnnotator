@@ -13,8 +13,13 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </Content>
+    <Content Include="manifest.json" />
     <Content Include="raidloot.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RaidLootAnnotator.Domain\RaidLootAnnotator.Domain.csproj" />
   </ItemGroup>
 </Project>

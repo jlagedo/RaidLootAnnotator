@@ -5,11 +5,19 @@ using System.IO;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using RaidLootAnnotator.Windows;
+using System.Net.Http;
 
 namespace RaidLootAnnotator;
 
 public sealed class Plugin : IDalamudPlugin
 {
+    public static readonly string PluginName = "RaidLootAnnotator";
+    private const string CommandName = "/raidloot";
+    private const string CommandNameAlias = "/rla";
+
+    private static readonly string MainCommandHelpMessage = $"View existing or add new gearsets\n      [config/c] - Open {PluginName} configuration\n      [new/n] - Add a new gearset";
+    private static readonly string AliasCommandHelpMessage = "Alias for /raidloot";
+
     [PluginService] internal static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
     [PluginService] internal static ITextureProvider TextureProvider { get; private set; } = null!;
     [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
@@ -17,13 +25,14 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static IDataManager DataManager { get; private set; } = null!;
     [PluginService] internal static IPluginLog Log { get; private set; } = null!;
 
-    private const string CommandName = "/raidloot";
 
     public Configuration Configuration { get; init; }
 
-    public readonly WindowSystem WindowSystem = new("RaidLootAnnotator");
+    public readonly WindowSystem WindowSystem = new(PluginName);
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
+
+    public static readonly HttpClient httpClient = new HttpClient();
 
     public Plugin()
     {
@@ -33,7 +42,7 @@ public sealed class Plugin : IDalamudPlugin
         var goatImagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "raidloot.png");
 
         ConfigWindow = new ConfigWindow(this);
-        MainWindow = new MainWindow(this, goatImagePath);
+        MainWindow = new MainWindow(this);
 
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
@@ -66,6 +75,8 @@ public sealed class Plugin : IDalamudPlugin
         MainWindow.Dispose();
 
         CommandManager.RemoveHandler(CommandName);
+
+        httpClient.Dispose();
     }
 
     private void OnCommand(string command, string args)

@@ -13,6 +13,31 @@
         "requested": "[1.2.25, )",
         "resolved": "1.2.25",
         "contentHash": "xCXiw7BCxHJ8pF6wPepRUddlh2dlQlbr81gXA72hdk4FLHkKXas7EH/n+fk5UCA/YfMqG1Z6XaPiUjDbUNBUzg=="
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions": {
+        "type": "Transitive",
+        "resolved": "9.0.5",
+        "contentHash": "cjnRtsEAzU73aN6W7vkWy8Phj5t3Xm78HSqgrbh/O4Q9SK/yN73wZVa21QQY6amSLQRQ/M8N+koGnY6PuvKQsw=="
+      },
+      "Microsoft.Extensions.Logging.Abstractions": {
+        "type": "Transitive",
+        "resolved": "9.0.5",
+        "contentHash": "pP1PADCrIxMYJXxFmTVbAgEU7GVpjK5i0/tyfU9DiE0oXQy3JWQaOVgCkrCiePLgS8b5sghM3Fau3EeHiVWbCg==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.5"
+        }
+      },
+      "System.Text.Json": {
+        "type": "Transitive",
+        "resolved": "9.0.5",
+        "contentHash": "rnP61ZfloTgPQPe7ecr36loNiGX3g1PocxlKHdY/FUpDSsExKkTxpMAlB4X35wNEPr1X7mkYZuQvW3Lhxmu7KA=="
+      },
+      "raidlootannotator.domain": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "[9.0.5, )",
+          "System.Text.Json": "[9.0.5, )"
+        }
       }
     }
   }
